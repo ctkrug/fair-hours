@@ -79,3 +79,31 @@ export function zonedTimeToUtc(year, month, day, hour, minute, timeZone) {
 
   return new Date(instantMs);
 }
+
+/** Comfort classifications for a teammate's local meeting hour. */
+export const COMFORT = Object.freeze({
+  COMFORTABLE: 'comfortable',
+  EARLY_OR_LATE: 'early-or-late',
+  UNREASONABLE: 'unreasonable',
+});
+
+// Local-hour thresholds (24h clock). Each is the first hour *inside* the
+// named band; a band runs from its own threshold up to the next one.
+export const COMFORTABLE_START_HOUR = 8; // 08:00 local and later...
+export const COMFORTABLE_END_HOUR = 18; // ...until 18:00 local is comfortable.
+export const REASONABLE_START_HOUR = 7; // 07:00-07:59 and 18:00-20:59...
+export const REASONABLE_END_HOUR = 21; // ...are early-or-late, not unreasonable.
+
+/**
+ * Classify a local wall-clock hour (0-23) as comfortable, early-or-late, or
+ * unreasonable, per the named thresholds above.
+ */
+export function classifyHour(hour) {
+  if (hour >= COMFORTABLE_START_HOUR && hour < COMFORTABLE_END_HOUR) {
+    return COMFORT.COMFORTABLE;
+  }
+  if (hour >= REASONABLE_START_HOUR && hour < REASONABLE_END_HOUR) {
+    return COMFORT.EARLY_OR_LATE;
+  }
+  return COMFORT.UNREASONABLE;
+}
