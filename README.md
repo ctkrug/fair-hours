@@ -19,15 +19,19 @@ someone, and why (a DST transition, not just "bad luck").
 
 ## The wow moment
 
-Enter a recurring Tuesday 9am PT meeting with teammates in London and Sydney. Fair
-Hours renders a full-year heatmap showing each teammate's local start time per week —
-and lights up the exact weeks each spring/fall where one person silently gets a 6am
-or 11pm call, because Australia's DST clock moves opposite the Northern Hemisphere's.
+Load the page and it's already filled in: a recurring Tuesday 1pm PT meeting with
+teammates in London and Sydney. Fair Hours renders a full-year heatmap showing each
+teammate's local start time per week — and the Sydney row swings from comfortable in
+January to unreasonable by mid-year, purely because Australia's DST clock moves
+opposite the Northern Hemisphere's, while London separately crosses its own comfort
+boundary on the UK's own March/October transition weeks.
 
-## Planned features
+## Features
 
-- **Recurring meeting input** — day of week, local start time, organizer IANA time zone.
-- **Teammate roster** — name + IANA time zone, add/remove freely.
+- **Recurring meeting input** — day of week, local start time, organizer IANA time
+  zone. Editing any field re-simulates and re-renders instantly, no reload.
+- **Teammate roster** — add/remove by name + IANA time zone; an inline error shows
+  for an unrecognized zone or empty name instead of a blank page.
 - **Full-year simulation** — walks every occurrence of the recurring meeting across 52
   weeks, resolving each teammate's local time with the correct UTC offset for that
   specific date (not a single snapshot).
@@ -35,10 +39,16 @@ or 11pm call, because Australia's DST clock moves opposite the Northern Hemisphe
   dates and in opposite directions, plus zones with no DST at all.
 - **Fairness heatmap** — one row per teammate, one column per week, colored by how
   reasonable that local time is (comfortable / early-or-late / unreasonable).
-- **Worst-week callouts** — a ranked list of the weeks and people most affected, with
-  the local time and the reason (e.g. "UK springs forward before the US").
-- **Shareable, no backend** — everything runs client-side against the IANA time zone
-  database; state is encodable in the URL so a plan can be shared with a link.
+
+## Running it
+
+No build step — open `site/index.html` directly, or serve the `site/` directory with
+any static file server (e.g. `npx serve site`).
+
+```
+npm test   # run the test suite
+npm run lint  # syntax-check every JS file
+```
 
 ## Stack
 
@@ -50,8 +60,10 @@ in CI.
 
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
+Core simulation, editable meeting/roster, and the fairness heatmap are built and
+working end to end (Epic 1) — see [`docs/VISION.md`](docs/VISION.md) for the full
+design and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's next (worst-week callouts,
+shareable URLs, hardening).
 
 ## License
 
