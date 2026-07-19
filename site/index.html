@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fair Hours — find the meeting time nobody notices is unfair</title>
   <meta name="description" content="Paste a recurring meeting and your team's time zones to see whose local time quietly turns unfair across a full year of DST shifts." />
+  <base href="./" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,15 +15,68 @@
 <body>
   <header class="site-header">
     <span class="wordmark">Fair<span class="wordmark-accent">Hours</span></span>
+    <p class="tagline">Whose local time is quietly worst, across a full year of DST shifts?</p>
   </header>
 
-  <main>
-    <p class="scaffold-note">
-      Scaffold running. The recurring-meeting form, roster, and full-year
-      fairness heatmap land in the build phase — see
-      <a href="../docs/VISION.md">docs/VISION.md</a> and
-      <a href="../docs/BACKLOG.md">docs/BACKLOG.md</a>.
-    </p>
+  <main class="layout">
+    <div class="rail">
+      <section class="panel" aria-labelledby="meeting-heading">
+        <h2 id="meeting-heading">Recurring meeting</h2>
+        <form id="meeting-form" novalidate>
+          <div class="field">
+            <label for="meeting-day">Day of week</label>
+            <select id="meeting-day" name="dayOfWeek">
+              <option value="0">Sunday</option>
+              <option value="1">Monday</option>
+              <option value="2" selected>Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5">Friday</option>
+              <option value="6">Saturday</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="meeting-time">Start time (organizer's local time)</label>
+            <input type="time" id="meeting-time" name="time" value="13:00" step="60" />
+          </div>
+          <div class="field">
+            <label for="meeting-tz">Organizer time zone</label>
+            <input type="text" id="meeting-tz" name="timeZone" value="America/Los_Angeles"
+                   placeholder="e.g. America/Los_Angeles" autocomplete="off"
+                   aria-describedby="meeting-tz-error" />
+          </div>
+          <p id="meeting-tz-error" class="field-error" role="alert"></p>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="roster-heading">
+        <h2 id="roster-heading">Roster</h2>
+        <ul id="roster-list" class="roster-list"></ul>
+        <form id="roster-add-form" novalidate>
+          <div class="field">
+            <label for="roster-name">Name</label>
+            <input type="text" id="roster-name" name="name" placeholder="Teammate name" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="roster-tz">Time zone</label>
+            <input type="text" id="roster-tz" name="timeZone" placeholder="e.g. Asia/Tokyo" autocomplete="off" />
+          </div>
+          <button type="submit" class="btn btn-accent">Add teammate</button>
+          <p id="roster-error" class="field-error" role="alert"></p>
+        </form>
+      </section>
+    </div>
+
+    <section class="panel heatmap-card" aria-labelledby="heatmap-heading">
+      <h2 id="heatmap-heading">Fairness heatmap</h2>
+      <p class="heatmap-subhead">One row per teammate, one column per week for the next year.</p>
+      <div id="heatmap" class="heatmap" aria-live="polite"></div>
+      <ul class="heatmap-legend">
+        <li><span class="legend-swatch cell-comfortable"></span> Comfortable</li>
+        <li><span class="legend-swatch cell-early-or-late"></span> Early or late</li>
+        <li><span class="legend-swatch cell-unreasonable"></span> Unreasonable</li>
+      </ul>
+    </section>
   </main>
 
   <script type="module" src="js/main.js"></script>
