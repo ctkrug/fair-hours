@@ -9,6 +9,7 @@ import {
   generateOccurrences,
   simulate,
 } from '../site/js/core/simulate.js';
+import { DEMO_MEETING, DEMO_ROSTER } from '../site/js/core/demo.js';
 
 test('isValidTimeZone accepts real IANA zones', () => {
   assert.equal(isValidTimeZone('America/Los_Angeles'), true);
@@ -183,4 +184,18 @@ test('simulate reveals the wow moment: asymmetric hemisphere DST flags different
   const sydneyTransitionWeek = sydney.weeks.findIndex((w) => w.classification === COMFORT.UNREASONABLE);
   const londonReliefWeek = london.weeks.findIndex((w) => w.classification === COMFORT.EARLY_OR_LATE);
   assert.notEqual(sydneyTransitionWeek, londonReliefWeek);
+});
+
+test('the pre-filled demo scenario uses valid IANA zones and reproduces the wow moment', () => {
+  assert.ok(isValidTimeZone(DEMO_MEETING.timeZone));
+  DEMO_ROSTER.forEach((person) => assert.ok(isValidTimeZone(person.timeZone)));
+
+  const result = simulate(DEMO_MEETING, DEMO_ROSTER, {
+    startDate: new Date('2026-01-01T00:00:00Z'),
+  });
+
+  assert.equal(result.length, 3);
+  const sydney = result.find((r) => r.timeZone === 'Australia/Sydney');
+  assert.equal(sydney.weeks[0].classification, COMFORT.COMFORTABLE);
+  assert.ok(sydney.weeks.some((w) => w.classification === COMFORT.UNREASONABLE));
 });
