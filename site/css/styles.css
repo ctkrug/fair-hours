@@ -41,7 +41,7 @@ body {
 }
 
 .site-header {
-  padding: var(--space-6) var(--space-8);
+  padding: var(--space-6) var(--space-8) var(--space-4);
 }
 
 .wordmark {
@@ -57,21 +57,63 @@ body {
   border-bottom: 2px solid var(--accent);
 }
 
-main {
+.tagline {
+  margin: var(--space-2) 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
   max-width: 60ch;
-  margin: var(--space-8) auto;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  align-items: start;
+  gap: var(--space-6);
+  max-width: 1400px;
+  margin: 0 auto var(--space-8);
   padding: 0 var(--space-8);
 }
 
-.scaffold-note {
-  background: var(--surface-1);
-  border: 1px solid var(--grid-line);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  color: var(--text-muted);
-  line-height: 1.6;
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
-.scaffold-note a {
-  color: var(--accent);
+.panel {
+  background: var(--surface-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--space-6);
+}
+
+.panel h2 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.heatmap-card {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.heatmap-subhead {
+  margin: 0 0 var(--space-4);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 0 var(--space-4);
+  }
+
+  .heatmap-card {
+    min-height: 40vh;
+  }
 }
