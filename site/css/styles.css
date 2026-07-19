@@ -117,3 +117,119 @@ body {
     min-height: 40vh;
   }
 }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.field label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.field select,
+.field input[type='text'],
+.field input[type='time'] {
+  appearance: none;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--grid-line);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  min-height: 44px;
+  transition: border-color 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.field select:hover,
+.field input[type='text']:hover,
+.field input[type='time']:hover {
+  border-color: var(--accent);
+}
+
+.field select:focus-visible,
+.field input[type='text']:focus-visible,
+.field input[type='time']:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 214, 232, 0.25);
+}
+
+.field select:disabled,
+.field input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.field-error {
+  min-height: 1.2em;
+  margin: var(--space-1) 0 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.field-error:empty {
+  visibility: hidden;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--grid-line);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  min-height: 44px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 150ms ease-out, background-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 214, 232, 0.35);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.btn-accent:hover {
+  background: #6ee0ef;
+}
+
+.btn-remove {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--grid-line);
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8rem;
+}
+
+.btn-remove:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
