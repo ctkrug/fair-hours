@@ -1,0 +1,20 @@
+{
+  "name": "fair-hours",
+  "version": "0.1.0",
+  "description": "See whose local time is quietly worst across a full year of a recurring meeting, DST included.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Charlie Krug",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ctkrug/fair-hours.git"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "lint": "node --check site/js/main.js && node --check site/js/core/simulate.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
