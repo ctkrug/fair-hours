@@ -6,6 +6,7 @@ import {
   zonedTimeToUtc,
   classifyHour,
   COMFORT,
+  generateOccurrences,
 } from '../site/js/core/simulate.js';
 
 test('isValidTimeZone accepts real IANA zones', () => {
@@ -90,4 +91,50 @@ test('classifyHour treats the dead of night as unreasonable', () => {
   assert.equal(classifyHour(0), COMFORT.UNREASONABLE);
   assert.equal(classifyHour(3), COMFORT.UNREASONABLE);
   assert.equal(classifyHour(23), COMFORT.UNREASONABLE);
+});
+
+test('generateOccurrences produces one instant per week for the requested span', () => {
+  const meeting = { dayOfWeek: 2, hour: 9, minute: 0, timeZone: 'America/Los_Angeles' };
+  const occurrences = generateOccurrences(meeting, {
+    weeks: 52,
+    startDate: new Date('2026-01-01T00:00:00Z'),
+  });
+
+  assert.equal(occurrences.length, 52);
+  occurrences.forEach((utc) => {
+    assert.equal(localTimeInZone(utc, meeting.timeZone).weekday, 'Tue');
+    assert.equal(localTimeInZone(utc, meeting.timeZone).hour, 9);
+  });
+});
+
+test('generateOccurrences steps exactly 7 calendar days apart in the organizer zone', () => {
+  const meeting = { dayOfWeek: 2, hour: 9, minute: 0, timeZone: 'America/Los_Angeles' };
+  const occurrences = generateOccurrences(meeting, {
+    weeks: 5,
+    startDate: new Date('2026-01-01T00:00:00Z'),
+  });
+
+  const days = occurrences.map((utc) => localTimeInZone(utc, meeting.timeZone).day);
+  assert.deepEqual(days, [6, 13, 20, 27, 3]);
+});
+
+test('generateOccurrences picks next week when the meeting time already passed today', () => {
+  const meeting = { dayOfWeek: 2, hour: 9, minute: 0, timeZone: 'America/Los_Angeles' };
+  // 2026-01-06 is a Tuesday; 18:00 UTC that day is already past 9am PT (17:00 UTC).
+  const occurrences = generateOccurrences(meeting, {
+    weeks: 1,
+    startDate: new Date('2026-01-06T18:00:00Z'),
+  });
+
+  assert.equal(localTimeInZone(occurrences[0], meeting.timeZone).day, 13);
+});
+
+test('generateOccurrences includes today when the meeting time has not yet passed', () => {
+  const meeting = { dayOfWeek: 2, hour: 9, minute: 0, timeZone: 'America/Los_Angeles' };
+  const occurrences = generateOccurrences(meeting, {
+    weeks: 1,
+    startDate: new Date('2026-01-06T15:00:00Z'),
+  });
+
+  assert.equal(localTimeInZone(occurrences[0], meeting.timeZone).day, 6);
 });
