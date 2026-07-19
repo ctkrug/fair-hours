@@ -1,0 +1,77 @@
+:root {
+  --bg: #0b1826;
+  --surface-1: #122536;
+  --surface-2: #182f45;
+  --grid-line: #1c3a52;
+  --text: #eaf4fb;
+  --text-muted: #8fb0c4;
+  --accent: #4fd6e8;
+  --accent-support: #f2a65a;
+  --success: #63d69a;
+  --danger: #ef5b6f;
+
+  --font-display: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --radius-sm: 4px;
+  --radius-lg: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+.site-header {
+  padding: var(--space-6) var(--space-8);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.wordmark-accent {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+main {
+  max-width: 60ch;
+  margin: var(--space-8) auto;
+  padding: 0 var(--space-8);
+}
+
+.scaffold-note {
+  background: var(--surface-1);
+  border: 1px solid var(--grid-line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.scaffold-note a {
+  color: var(--accent);
+}
