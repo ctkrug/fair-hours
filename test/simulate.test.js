@@ -7,6 +7,7 @@ import {
   classifyHour,
   COMFORT,
   generateOccurrences,
+  simulate,
 } from '../site/js/core/simulate.js';
 
 test('isValidTimeZone accepts real IANA zones', () => {
@@ -137,4 +138,49 @@ test('generateOccurrences includes today when the meeting time has not yet passe
   });
 
   assert.equal(localTimeInZone(occurrences[0], meeting.timeZone).day, 6);
+});
+
+test('simulate returns one entry per roster member with 52 classified weeks', () => {
+  const meeting = { dayOfWeek: 2, hour: 13, minute: 0, timeZone: 'America/Los_Angeles' };
+  const roster = [
+    { name: 'Organizer', timeZone: 'America/Los_Angeles' },
+    { name: 'London', timeZone: 'Europe/London' },
+  ];
+  const result = simulate(meeting, roster, { startDate: new Date('2026-01-01T00:00:00Z') });
+
+  assert.equal(result.length, 2);
+  assert.equal(result[0].name, 'Organizer');
+  assert.equal(result[0].weeks.length, 52);
+  assert.ok(Object.values(COMFORT).includes(result[0].weeks[0].classification));
+});
+
+test('simulate reveals the wow moment: asymmetric hemisphere DST flags different weeks', () => {
+  // A 1pm PT meeting keeps the organizer comfortable year-round. Sydney
+  // swings dramatically -- comfortable in January (Southern Hemisphere
+  // daylight saving), unreasonable by mid-year once Australia falls back
+  // in April -- while London separately crosses its own comfort boundary
+  // during the UK's March/October transitions. Because the UK and
+  // Australia shift clocks on different dates in different directions,
+  // the two teammates' transition weeks don't coincide.
+  const meeting = { dayOfWeek: 2, hour: 13, minute: 0, timeZone: 'America/Los_Angeles' };
+  const roster = [
+    { name: 'Organizer', timeZone: 'America/Los_Angeles' },
+    { name: 'London', timeZone: 'Europe/London' },
+    { name: 'Sydney', timeZone: 'Australia/Sydney' },
+  ];
+  const result = simulate(meeting, roster, { startDate: new Date('2026-01-01T00:00:00Z') });
+
+  const london = result.find((r) => r.name === 'London');
+  const sydney = result.find((r) => r.name === 'Sydney');
+
+  assert.equal(sydney.weeks[0].classification, COMFORT.COMFORTABLE);
+  assert.equal(sydney.weeks[25].classification, COMFORT.UNREASONABLE);
+
+  const londonClassifications = new Set(london.weeks.map((w) => w.classification));
+  assert.ok(londonClassifications.has(COMFORT.UNREASONABLE));
+  assert.ok(londonClassifications.has(COMFORT.EARLY_OR_LATE));
+
+  const sydneyTransitionWeek = sydney.weeks.findIndex((w) => w.classification === COMFORT.UNREASONABLE);
+  const londonReliefWeek = london.weeks.findIndex((w) => w.classification === COMFORT.EARLY_OR_LATE);
+  assert.notEqual(sydneyTransitionWeek, londonReliefWeek);
 });
