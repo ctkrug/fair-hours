@@ -107,3 +107,73 @@ export function classifyHour(hour) {
   }
   return COMFORT.UNREASONABLE;
 }
+
+/**
+ * Generate the UTC instants for every occurrence of a recurring meeting.
+ *
+ * `meeting.dayOfWeek` is 0 (Sunday) - 6 (Saturday), in the organizer's own
+ * time zone. The first occurrence is the next matching weekday on or after
+ * `startDate` (today, if it's that weekday and the time hasn't passed yet);
+ * every occurrence after that is exactly 7 calendar days later in the
+ * organizer's zone, re-resolved through `zonedTimeToUtc` so each one
+ * reflects that date's real offset rather than a fixed cadence in UTC.
+ */
+export function generateOccurrences(meeting, options = {}) {
+  const { dayOfWeek, hour, minute, timeZone } = meeting;
+  const { weeks = 52, startDate = new Date() } = options;
+
+  const today = localTimeInZone(startDate, timeZone);
+  const todayWeekday = WEEKDAY_NAMES.indexOf(today.weekday);
+
+  let daysUntilFirst = (dayOfWeek - todayWeekday + 7) % 7;
+  const meetingAlreadyPassedToday =
+    today.hour > hour || (today.hour === hour && today.minute >= minute);
+  if (daysUntilFirst === 0 && meetingAlreadyPassedToday) {
+    daysUntilFirst = 7;
+  }
+
+  // Calendar-day arithmetic only: these ms values are never treated as real
+  // instants, just used to step whole days across the organizer's calendar.
+  const todayAsCalendarMs = Date.UTC(today.year, today.month - 1, today.day);
+  const firstOccurrenceCalendarMs = todayAsCalendarMs + daysUntilFirst * 86400000;
+
+  const occurrences = [];
+  for (let week = 0; week < weeks; week += 1) {
+    const calendarMs = firstOccurrenceCalendarMs + week * 7 * 86400000;
+    const calendarDate = new Date(calendarMs);
+    occurrences.push(
+      zonedTimeToUtc(
+        calendarDate.getUTCFullYear(),
+        calendarDate.getUTCMonth() + 1,
+        calendarDate.getUTCDate(),
+        hour,
+        minute,
+        timeZone
+      )
+    );
+  }
+  return occurrences;
+}
+
+/**
+ * Simulate a recurring meeting across a roster: for every teammate, resolve
+ * every occurrence to that teammate's local wall time and comfort
+ * classification. Returns one entry per roster member, each carrying its
+ * own week-by-week results — fairness is reported per person, never
+ * collapsed into a single team-wide average.
+ */
+export function simulate(meeting, roster, options = {}) {
+  const occurrences = generateOccurrences(meeting, options);
+
+  return roster.map((person) => ({
+    ...person,
+    weeks: occurrences.map((utc) => {
+      const local = localTimeInZone(utc, person.timeZone);
+      return {
+        utc,
+        local,
+        classification: classifyHour(local.hour),
+      };
+    }),
+  }));
+}
