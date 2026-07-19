@@ -1,6 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isValidTimeZone, localTimeInZone, zonedTimeToUtc } from '../site/js/core/simulate.js';
+import {
+  isValidTimeZone,
+  localTimeInZone,
+  zonedTimeToUtc,
+  classifyHour,
+  COMFORT,
+} from '../site/js/core/simulate.js';
 
 test('isValidTimeZone accepts real IANA zones', () => {
   assert.equal(isValidTimeZone('America/Los_Angeles'), true);
@@ -52,4 +58,36 @@ test('zonedTimeToUtc round-trips through localTimeInZone', () => {
   assert.equal(local.hour, 14);
   assert.equal(local.minute, 30);
   assert.equal(local.day, 3);
+});
+
+test('classifyHour treats mid-morning through afternoon as comfortable', () => {
+  assert.equal(classifyHour(8), COMFORT.COMFORTABLE);
+  assert.equal(classifyHour(12), COMFORT.COMFORTABLE);
+  assert.equal(classifyHour(17), COMFORT.COMFORTABLE);
+});
+
+test('classifyHour boundary: 06:59 is unreasonable, 07:00 is early-or-late', () => {
+  assert.equal(classifyHour(6), COMFORT.UNREASONABLE);
+  assert.equal(classifyHour(7), COMFORT.EARLY_OR_LATE);
+});
+
+test('classifyHour boundary: 07:59 is early-or-late, 08:00 is comfortable', () => {
+  assert.equal(classifyHour(7), COMFORT.EARLY_OR_LATE);
+  assert.equal(classifyHour(8), COMFORT.COMFORTABLE);
+});
+
+test('classifyHour boundary: 17:59 is comfortable, 18:00 is early-or-late', () => {
+  assert.equal(classifyHour(17), COMFORT.COMFORTABLE);
+  assert.equal(classifyHour(18), COMFORT.EARLY_OR_LATE);
+});
+
+test('classifyHour boundary: 20:59 is early-or-late, 21:00 is unreasonable', () => {
+  assert.equal(classifyHour(20), COMFORT.EARLY_OR_LATE);
+  assert.equal(classifyHour(21), COMFORT.UNREASONABLE);
+});
+
+test('classifyHour treats the dead of night as unreasonable', () => {
+  assert.equal(classifyHour(0), COMFORT.UNREASONABLE);
+  assert.equal(classifyHour(3), COMFORT.UNREASONABLE);
+  assert.equal(classifyHour(23), COMFORT.UNREASONABLE);
 });
