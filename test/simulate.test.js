@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isValidTimeZone, localTimeInZone } from '../site/js/core/simulate.js';
+import { isValidTimeZone, localTimeInZone, zonedTimeToUtc } from '../site/js/core/simulate.js';
 
 test('isValidTimeZone accepts real IANA zones', () => {
   assert.equal(isValidTimeZone('America/Los_Angeles'), true);
@@ -31,4 +31,25 @@ test('localTimeInZone reflects the DST shift across a transition', () => {
   const after = localTimeInZone(new Date(Date.UTC(2026, 2, 15, 17, 0)), 'America/Los_Angeles');
 
   assert.notEqual(before.hour, after.hour);
+});
+
+test('zonedTimeToUtc inverts localTimeInZone for a winter date', () => {
+  // 9am PT in January is PST (UTC-8) -> 17:00 UTC.
+  const utc = zonedTimeToUtc(2026, 1, 6, 9, 0, 'America/Los_Angeles');
+  assert.equal(utc.toISOString(), '2026-01-06T17:00:00.000Z');
+});
+
+test('zonedTimeToUtc reflects the organizer zone crossing into its own DST', () => {
+  // Same 9am PT wall time in July is PDT (UTC-7) -> 16:00 UTC, one hour
+  // earlier than the January instant despite an identical local time.
+  const utc = zonedTimeToUtc(2026, 7, 6, 9, 0, 'America/Los_Angeles');
+  assert.equal(utc.toISOString(), '2026-07-06T16:00:00.000Z');
+});
+
+test('zonedTimeToUtc round-trips through localTimeInZone', () => {
+  const utc = zonedTimeToUtc(2026, 11, 3, 14, 30, 'Australia/Sydney');
+  const local = localTimeInZone(utc, 'Australia/Sydney');
+  assert.equal(local.hour, 14);
+  assert.equal(local.minute, 30);
+  assert.equal(local.day, 3);
 });
