@@ -47,3 +47,35 @@ export function localTimeInZone(utcDate, timeZone) {
     minute: Number(parts.minute),
   };
 }
+
+const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+/**
+ * The IANA offset (in minutes) such that `wall-clock time in `timeZone`
+ * expressed as a UTC-labeled instant` === `instantMs + offset`.
+ */
+function offsetMinutesAt(instantMs, timeZone) {
+  const local = localTimeInZone(new Date(instantMs), timeZone);
+  const asUtc = Date.UTC(local.year, local.month - 1, local.day, local.hour, local.minute);
+  return (asUtc - instantMs) / 60000;
+}
+
+/**
+ * Resolve the real UTC instant for a wall-clock date/time in `timeZone`.
+ * Intl only exposes UTC-instant -> local-wall conversion, so this inverts it:
+ * guess the offset from a naive UTC interpretation of the wall time, then
+ * refine once against that guess to handle dates where the offset itself
+ * changes (a DST transition week).
+ */
+export function zonedTimeToUtc(year, month, day, hour, minute, timeZone) {
+  const naiveUtcMs = Date.UTC(year, month - 1, day, hour, minute);
+  const offset = offsetMinutesAt(naiveUtcMs, timeZone);
+  let instantMs = naiveUtcMs - offset * 60000;
+
+  const refinedOffset = offsetMinutesAt(instantMs, timeZone);
+  if (refinedOffset !== offset) {
+    instantMs = naiveUtcMs - refinedOffset * 60000;
+  }
+
+  return new Date(instantMs);
+}
