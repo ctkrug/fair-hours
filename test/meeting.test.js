@@ -42,6 +42,12 @@ test('parseMeetingInput rejects non-numeric fields instead of throwing', () => {
   assert.ok(result.error);
 });
 
+test('parseMeetingInput rejects blank numeric form fields', () => {
+  assert.equal(parseMeetingInput({ ...VALID, dayOfWeek: '' }).ok, false);
+  assert.equal(parseMeetingInput({ ...VALID, hour: '' }).ok, false);
+  assert.equal(parseMeetingInput({ ...VALID, minute: '' }).ok, false);
+});
+
 test('parseMeetingInput rejects an absent object instead of throwing', () => {
   const result = parseMeetingInput();
   assert.equal(result.ok, false);
