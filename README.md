@@ -31,7 +31,11 @@ boundary on the UK's own March/October transition weeks.
 - **Recurring meeting input** — day of week, local start time, organizer IANA time
   zone. Editing any field re-simulates and re-renders instantly, no reload.
 - **Teammate roster** — add/remove by name + IANA time zone; an inline error shows
-  for an unrecognized zone or empty name instead of a blank page.
+  for an unrecognized zone, empty name, duplicate zone, or oversized roster instead
+  of a blank page.
+- **Shareable plans** — the complete meeting and roster live in the URL, so copying
+  the themed share link reproduces the same heatmap. Malformed links visibly fall
+  back to the demo instead of breaking the app.
 - **Full-year simulation** — walks every occurrence of the recurring meeting across 52
   weeks, resolving each teammate's local time with the correct UTC offset for that
   specific date (not a single snapshot).
@@ -64,8 +68,8 @@ in CI.
 
 ## Status
 
-Core simulation, editable meeting/roster, full-year heatmap, and DST explainability
-are built and working end to end (Epics 1–2) — see
+Core simulation, editable meeting/roster, full-year heatmap, DST explainability, and
+shareable validated plans are built and working end to end (Epics 1–3) — see
 [`docs/VISION.md`](docs/VISION.md) for the full design and
 [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's next (shareable URLs and hardening).
 
