@@ -61,7 +61,7 @@ concrete, checkable acceptance criteria — no "works well" vibes checks.
 
 ## Epic 2 — Fairness detail & explainability
 
-- [ ] **2.1 — Worst-week callout list.**
+- [x] **2.1 — Worst-week callout list.**
   Below the heatmap, list the worst weeks ranked by severity, each showing
   the affected teammate, the local time that week, and which zone's DST
   transition caused it.
@@ -70,14 +70,14 @@ concrete, checkable acceptance criteria — no "works well" vibes checks.
   - Each callout names a specific transition (e.g. "Australia/Sydney DST
     starts Oct 4") rather than a generic "time zone difference" message.
 
-- [ ] **2.2 — Callout-to-heatmap linking.**
+- [x] **2.2 — Callout-to-heatmap linking.**
   Selecting a callout highlights and scrolls to the matching heatmap cell.
   - Works via mouse click and via keyboard (Enter/Space) on a focused
     callout.
   - The highlighted cell is visually distinct (not just a color already used
     for classification) and clears when a different callout is selected.
 
-- [ ] **2.3 — Per-cell hover/focus detail.**
+- [x] **2.3 — Per-cell hover/focus detail.**
   Hovering or keyboard-focusing any heatmap cell shows the exact local date,
   time, and comfort classification for that teammate/week.
   - Reachable by keyboard alone (Tab/arrow navigation through cells), not
@@ -85,7 +85,7 @@ concrete, checkable acceptance criteria — no "works well" vibes checks.
   - Detail content is exposed to assistive tech (not a mouse-only CSS
     tooltip with no accessible equivalent).
 
-- [ ] **2.4 — Design polish: callouts & cell detail.**
+- [x] **2.4 — Design polish: callouts & cell detail.**
   Apply DESIGN.md tokens/motion to the new UI from this epic.
   - Hover/focus/active transitions measured at 120–250ms ease-out.
   - Squint test: callout severity ranking is visually scannable without
