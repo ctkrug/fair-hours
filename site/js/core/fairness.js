@@ -81,7 +81,7 @@ export function transitionLabel(transition) {
 export function buildWorstWeekCallouts(simulationResult, organizerTimeZone) {
   const callouts = [];
 
-  simulationResult.forEach((person) => {
+  simulationResult.forEach((person, personIndex) => {
     person.weeks.forEach((week, weekIndex) => {
       if (weekIndex === 0) return;
       const previous = person.weeks[weekIndex - 1];
@@ -95,6 +95,7 @@ export function buildWorstWeekCallouts(simulationResult, organizerTimeZone) {
 
       callouts.push({
         person,
+        personIndex,
         week,
         weekIndex,
         severity,
