@@ -39,6 +39,10 @@ boundary on the UK's own March/October transition weeks.
   dates and in opposite directions, plus zones with no DST at all.
 - **Fairness heatmap** — one row per teammate, one column per week, colored by how
   reasonable that local time is (comfortable / early-or-late / unreasonable).
+- **Explainable worst weeks** — ranked annotations show the local time, how far it
+  sits outside the comfort window, and the named IANA DST transition that made it
+  worse. Select an annotation to jump straight to its heatmap week; select or focus
+  any cell for an accessible exact date/time readout.
 
 ## Running it
 
@@ -60,10 +64,10 @@ in CI.
 
 ## Status
 
-Core simulation, editable meeting/roster, and the fairness heatmap are built and
-working end to end (Epic 1) — see [`docs/VISION.md`](docs/VISION.md) for the full
-design and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's next (worst-week callouts,
-shareable URLs, hardening).
+Core simulation, editable meeting/roster, full-year heatmap, and DST explainability
+are built and working end to end (Epics 1–2) — see
+[`docs/VISION.md`](docs/VISION.md) for the full design and
+[`docs/BACKLOG.md`](docs/BACKLOG.md) for what's next (shareable URLs and hardening).
 
 ## License
 
