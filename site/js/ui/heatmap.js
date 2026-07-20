@@ -2,6 +2,7 @@
 // simulated week. The color-per-classification mapping is a pure function
 // so a threshold change alone changes what's on screen (BACKLOG.md 1.4).
 
+import { comfortLabel, formatLocalTime } from '../core/fairness.js';
 import { COMFORT } from '../core/simulate.js';
 
 const CELL_CLASS_BY_COMFORT = {
@@ -17,23 +18,31 @@ export function cellClassFor(classification) {
 
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-function formatLocalTime(local) {
-  const hour12 = ((local.hour + 11) % 12) + 1;
-  const suffix = local.hour < 12 ? 'AM' : 'PM';
-  return `${hour12}:${String(local.minute).padStart(2, '0')} ${suffix}`;
-}
-
-function cellTitle(person, week) {
+/** Return the exact local date, time, and comfort classification for a cell. */
+export function cellDetail(person, week) {
   const { local, classification } = week;
   const weekday = WEEKDAY_LABELS[new Date(Date.UTC(local.year, local.month - 1, local.day)).getUTCDay()];
-  return `${person.name} — ${weekday} ${local.month}/${local.day}, ${formatLocalTime(local)} (${classification.replace(/-/g, ' ')})`;
+  return `${person.name} — ${weekday} ${local.month}/${local.day}/${local.year}, ${formatLocalTime(local)} (${comfortLabel(classification)})`;
+}
+
+/** Calculate the next keyboard target, clamping at the heatmap's edges. */
+export function nextCellCoordinates(row, week, rowCount, weekCount, key) {
+  const movement = {
+    ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1],
+  }[key];
+  if (!movement) return null;
+  return {
+    row: Math.max(0, Math.min(rowCount - 1, row + movement[0])),
+    week: Math.max(0, Math.min(weekCount - 1, week + movement[1])),
+  };
 }
 
 /**
  * Render the heatmap grid into `container`, replacing any previous content.
  * `simulationResult` is the array returned by `simulate()`.
  */
-export function renderHeatmap(container, simulationResult) {
+export function renderHeatmap(container, simulationResult, options = {}) {
+  const { onCellSelect, selectedCell } = options;
   container.innerHTML = '';
 
   if (simulationResult.length === 0) {
@@ -49,7 +58,7 @@ export function renderHeatmap(container, simulationResult) {
   grid.className = 'heatmap-grid';
   grid.style.setProperty('--week-count', String(weekCount));
 
-  simulationResult.forEach((person) => {
+  simulationResult.forEach((person, personIndex) => {
     const row = document.createElement('div');
     row.className = 'heatmap-row';
 
@@ -60,10 +69,32 @@ export function renderHeatmap(container, simulationResult) {
 
     const cells = document.createElement('div');
     cells.className = 'heatmap-cells';
-    person.weeks.forEach((week) => {
-      const cell = document.createElement('span');
+    person.weeks.forEach((week, weekIndex) => {
+      const cell = document.createElement('button');
+      cell.type = 'button';
       cell.className = `heatmap-cell ${cellClassFor(week.classification)}`;
-      cell.title = cellTitle(person, week);
+      cell.dataset.personIndex = String(personIndex);
+      cell.dataset.weekIndex = String(weekIndex);
+      cell.setAttribute('aria-label', cellDetail(person, week));
+      cell.setAttribute('aria-pressed', String(
+        selectedCell?.personIndex === personIndex && selectedCell?.weekIndex === weekIndex
+      ));
+      if (selectedCell?.personIndex === personIndex && selectedCell?.weekIndex === weekIndex) {
+        cell.classList.add('is-selected');
+      }
+      const select = () => onCellSelect?.({ personIndex, weekIndex, person, week, source: 'cell' });
+      cell.addEventListener('click', select);
+      cell.addEventListener('focus', select);
+      cell.addEventListener('keydown', (event) => {
+        const next = nextCellCoordinates(
+          personIndex, weekIndex, simulationResult.length, weekCount, event.key
+        );
+        if (!next) return;
+        event.preventDefault();
+        grid.querySelector(
+          `[data-person-index="${next.row}"][data-week-index="${next.week}"]`
+        )?.focus();
+      });
       cells.appendChild(cell);
     });
     row.appendChild(cells);
