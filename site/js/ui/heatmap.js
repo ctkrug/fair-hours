@@ -25,6 +25,11 @@ export function cellDetail(person, week) {
   return `${person.name} — ${weekday} ${local.month}/${local.day}/${local.year}, ${formatLocalTime(local)} (${comfortLabel(classification)})`;
 }
 
+/** Return whether a coordinate is the currently selected heatmap cell. */
+export function isSelectedCell(selectedCell, personIndex, weekIndex) {
+  return selectedCell?.personIndex === personIndex && selectedCell?.weekIndex === weekIndex;
+}
+
 /** Calculate the next keyboard target, clamping at the heatmap's edges. */
 export function nextCellCoordinates(row, week, rowCount, weekCount, key) {
   const movement = {
@@ -76,10 +81,8 @@ export function renderHeatmap(container, simulationResult, options = {}) {
       cell.dataset.personIndex = String(personIndex);
       cell.dataset.weekIndex = String(weekIndex);
       cell.setAttribute('aria-label', cellDetail(person, week));
-      cell.setAttribute('aria-pressed', String(
-        selectedCell?.personIndex === personIndex && selectedCell?.weekIndex === weekIndex
-      ));
-      if (selectedCell?.personIndex === personIndex && selectedCell?.weekIndex === weekIndex) {
+      cell.setAttribute('aria-pressed', String(isSelectedCell(selectedCell, personIndex, weekIndex)));
+      if (isSelectedCell(selectedCell, personIndex, weekIndex)) {
         cell.classList.add('is-selected');
       }
       const select = () => onCellSelect?.({ personIndex, weekIndex, person, week, source: 'cell' });

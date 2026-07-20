@@ -95,8 +95,24 @@ function render() {
   renderRosterList();
 }
 
-function showCellDetail({ person, week }) {
+function syncHeatmapSelection() {
+  heatmapEl.querySelectorAll('.heatmap-cell.is-selected').forEach((cell) => {
+    cell.classList.remove('is-selected');
+    cell.setAttribute('aria-pressed', 'false');
+  });
+  const selected = heatmapEl.querySelector(
+    `[data-person-index="${state.selectedCell?.personIndex}"][data-week-index="${state.selectedCell?.weekIndex}"]`
+  );
+  selected?.classList.add('is-selected');
+  selected?.setAttribute('aria-pressed', 'true');
+}
+
+function showCellDetail({ person, week, personIndex, weekIndex }) {
   cellDetailEl.textContent = cellDetail(person, week);
+  if (Number.isInteger(personIndex) && Number.isInteger(weekIndex)) {
+    state.selectedCell = { personIndex, weekIndex };
+    syncHeatmapSelection();
+  }
 }
 
 function selectCallout(callout) {
