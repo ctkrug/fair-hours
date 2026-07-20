@@ -6,7 +6,10 @@ import { isValidTimeZone } from './simulate.js';
 
 /** Validate a raw IANA time zone string from a form field. */
 export function validateTimeZoneInput(rawTimeZone) {
-  const trimmed = (rawTimeZone ?? '').trim();
+  if (typeof rawTimeZone !== 'string') {
+    return { ok: false, error: 'Time zone is required.' };
+  }
+  const trimmed = rawTimeZone.trim();
   if (!trimmed) {
     return { ok: false, error: 'Time zone is required.' };
   }
