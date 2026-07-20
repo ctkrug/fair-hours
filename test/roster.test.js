@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { addTeammate, removeTeammate } from '../site/js/core/roster.js';
+import { addTeammate, MAX_ROSTER_SIZE, removeTeammate } from '../site/js/core/roster.js';
 
 test('addTeammate appends a valid teammate without mutating the input', () => {
   const original = [{ name: 'Organizer', timeZone: 'America/Los_Angeles' }];
@@ -34,6 +34,26 @@ test('addTeammate works on an empty roster', () => {
   const result = addTeammate([], 'Noah', 'Australia/Sydney');
   assert.equal(result.ok, true);
   assert.equal(result.roster.length, 1);
+});
+
+test('addTeammate rejects a duplicate teammate zone and preserves the roster', () => {
+  const roster = [{ name: 'Priya', timeZone: 'Europe/London' }];
+  const result = addTeammate(roster, 'Sam', 'Europe/London');
+  assert.equal(result.ok, false);
+  assert.match(result.error, /distinct/i);
+  assert.equal(result.roster, roster);
+});
+
+test('addTeammate accepts the final available slot and rejects the next one', () => {
+  const roster = Array.from({ length: MAX_ROSTER_SIZE - 1 }, (_, index) => ({
+    name: `Person ${index}`, timeZone: `Etc/GMT${index === 0 ? '' : `+${index}`}`,
+  }));
+  // Existing zones need not be valid here; this test only verifies roster size.
+  const finalSlot = addTeammate(roster, 'Final person', 'Europe/London');
+  assert.equal(finalSlot.ok, true);
+  const overflow = addTeammate(finalSlot.roster, 'Overflow', 'Asia/Tokyo');
+  assert.equal(overflow.ok, false);
+  assert.match(overflow.error, /at most/i);
 });
 
 test('removeTeammate removes only the requested index', () => {
