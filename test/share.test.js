@@ -40,3 +40,14 @@ test('decodePlanState rejects roster entries with malformed fields', () => {
   }));
   assert.equal(decodePlanState(malformed).ok, false);
 });
+
+test('decodePlanState rejects duplicate zones in a shared roster', () => {
+  const duplicateZones = encodeURIComponent(JSON.stringify({
+    meeting,
+    roster: [
+      { name: 'Priya', timeZone: 'Europe/London' },
+      { name: 'Sam', timeZone: 'Europe/London' },
+    ],
+  }));
+  assert.equal(decodePlanState(duplicateZones).ok, false);
+});
