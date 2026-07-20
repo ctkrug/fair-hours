@@ -112,6 +112,7 @@ body {
 
 .heatmap-card {
   min-height: 60vh;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
