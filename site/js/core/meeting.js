@@ -16,7 +16,9 @@ function parseIntegerInput(value) {
  * Parse raw meeting-form fields (strings, as they arrive from form inputs)
  * into a validated meeting object, or a designed error.
  */
-export function parseMeetingInput({ dayOfWeek, hour, minute, timeZone } = {}) {
+export function parseMeetingInput(rawInput = {}) {
+  const { dayOfWeek, hour, minute, timeZone } =
+    rawInput && typeof rawInput === 'object' ? rawInput : {};
   const timeZoneResult = validateTimeZoneInput(timeZone);
   if (!timeZoneResult.ok) {
     return { ok: false, error: timeZoneResult.error };
