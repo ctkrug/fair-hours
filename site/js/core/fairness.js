@@ -72,3 +72,37 @@ export function transitionLabel(transition) {
   if (!transition) return 'No nearby DST transition';
   return `${transition.timeZone} DST ${transition.direction} ${MONTH_NAMES[transition.local.month - 1]} ${transition.local.day}`;
 }
+
+/**
+ * Return the weeks where a DST shift makes a person's meeting time worse.
+ * Rankings use minute distance from the comfortable window, then preserve
+ * chronological order for equal impacts.
+ */
+export function buildWorstWeekCallouts(simulationResult, organizerTimeZone) {
+  const callouts = [];
+
+  simulationResult.forEach((person) => {
+    person.weeks.forEach((week, weekIndex) => {
+      if (weekIndex === 0) return;
+      const previous = person.weeks[weekIndex - 1];
+      const severity = severityMinutes(week.local);
+      if (severity <= severityMinutes(previous.local)) return;
+
+      const transition =
+        findRecentTransition(week.utc, person.timeZone) ??
+        findRecentTransition(week.utc, organizerTimeZone);
+      if (!transition) return;
+
+      callouts.push({
+        person,
+        week,
+        weekIndex,
+        severity,
+        transition,
+        transitionText: transitionLabel(transition),
+      });
+    });
+  });
+
+  return callouts.sort((a, b) => b.severity - a.severity || a.weekIndex - b.weekIndex);
+}
