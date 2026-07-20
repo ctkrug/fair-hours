@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   comfortLabel,
+  buildWorstWeekCallouts,
   findRecentTransition,
   formatLocalTime,
   severityMinutes,
@@ -45,4 +46,44 @@ test('findRecentTransition identifies London daylight saving ending and ignores 
   assert.equal(transition.direction, 'ends');
   assert.equal(transitionLabel(transition), 'Europe/London DST ends Oct 25');
   assert.equal(findRecentTransition(new Date('2026-07-14T20:00:00Z'), 'Europe/London'), null);
+});
+
+test('buildWorstWeekCallouts ranks increased discomfort and keeps its transition explanation', () => {
+  const utc = new Date('2026-03-10T20:00:00Z');
+  const result = [{
+    name: 'New York',
+    timeZone: 'America/New_York',
+    weeks: [
+      { utc: new Date('2026-03-03T20:00:00Z'), local: { hour: 6, minute: 0 } },
+      { utc, local: { hour: 5, minute: 30 } },
+    ],
+  }, {
+    name: 'Chicago',
+    timeZone: 'America/Chicago',
+    weeks: [
+      { utc: new Date('2026-03-03T20:00:00Z'), local: { hour: 19, minute: 0 } },
+      { utc, local: { hour: 20, minute: 0 } },
+    ],
+  }];
+
+  const callouts = buildWorstWeekCallouts(result, 'America/Los_Angeles');
+  assert.equal(callouts.length, 2);
+  assert.equal(callouts[0].person.name, 'New York');
+  assert.equal(callouts[0].severity, 150);
+  assert.equal(callouts[0].transitionText, 'America/New_York DST starts Mar 8');
+  assert.equal(callouts[1].person.name, 'Chicago');
+});
+
+test('buildWorstWeekCallouts excludes stable and improving weeks', () => {
+  const utc = new Date('2026-07-14T20:00:00Z');
+  const result = [{
+    name: 'Stable',
+    timeZone: 'Europe/London',
+    weeks: [
+      { utc: new Date('2026-07-07T20:00:00Z'), local: { hour: 20, minute: 0 } },
+      { utc, local: { hour: 20, minute: 0 } },
+      { utc, local: { hour: 19, minute: 0 } },
+    ],
+  }];
+  assert.deepEqual(buildWorstWeekCallouts(result, 'America/Los_Angeles'), []);
 });
