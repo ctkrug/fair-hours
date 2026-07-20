@@ -63,6 +63,16 @@ test('zonedTimeToUtc round-trips through localTimeInZone', () => {
   assert.equal(local.day, 3);
 });
 
+test('zonedTimeToUtc moves a skipped spring-forward time forward by the gap', () => {
+  // 2:30 AM does not exist in Los Angeles on 2026-03-08. Recurring calendar
+  // events conventionally continue at 3:30 AM rather than moving backward.
+  const utc = zonedTimeToUtc(2026, 3, 8, 2, 30, 'America/Los_Angeles');
+  const local = localTimeInZone(utc, 'America/Los_Angeles');
+
+  assert.equal(local.hour, 3);
+  assert.equal(local.minute, 30);
+});
+
 test('classifyHour treats mid-morning through afternoon as comfortable', () => {
   assert.equal(classifyHour(8), COMFORT.COMFORTABLE);
   assert.equal(classifyHour(12), COMFORT.COMFORTABLE);
