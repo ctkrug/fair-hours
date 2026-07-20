@@ -21,7 +21,10 @@ export function validateTimeZoneInput(rawTimeZone) {
 
 /** Validate a raw teammate name from a form field. */
 export function validateTeammateName(rawName) {
-  const trimmed = (rawName ?? '').trim();
+  if (typeof rawName !== 'string') {
+    return { ok: false, error: 'Name is required.' };
+  }
+  const trimmed = rawName.trim();
   if (!trimmed) {
     return { ok: false, error: 'Name is required.' };
   }
