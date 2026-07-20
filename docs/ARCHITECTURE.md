@@ -19,6 +19,7 @@ site/
       meeting.js           parses/validates raw meeting-form input
       roster.js            pure add/remove roster operations
       validation.js        shared name/time-zone field validation
+      share.js             validated URL plan serialization and decoding
       fairness.js          severity metric and DST transition annotations
     ui/
       heatmap.js           renders keyboard-inspectable heatmap cells
@@ -42,6 +43,11 @@ test/
    the adjacent `.field-error` element and leaves `state` (and the
    heatmap) untouched. Bad input never reaches the DST math or blanks the
    page.
+4. On startup `main.js` decodes a `plan` query parameter through
+   `decodePlanState`; valid links replace the demo before the initial render.
+   Invalid links keep the demo and announce a visible recovery notice. Each
+   successful edit replaces the query state, and the Copy share link action
+   copies that complete current URL with a designed Clipboard API error state.
 
 ## The core simulation (`core/simulate.js`)
 
@@ -102,6 +108,14 @@ shifted, and sorts the records worst-first. `renderCallouts` creates native
 buttons for those records. Selecting one focuses and smoothly scrolls to its
 matching heatmap cell, rather than leaving the explanation disconnected from
 the year view.
+
+## Sharing and validation (`core/share.js`, `core/roster.js`)
+
+`encodePlanState` stores the full meeting and roster in a URL-safe `plan`
+query value; `decodePlanState` routes every decoded field through the normal
+meeting and roster validators. A plan can have at most 50 distinct teammate
+time zones, which keeps shared URLs and the rendered heatmap intentionally
+bounded. Decode failures return a designed result object rather than throwing.
 
 ## Running things
 
