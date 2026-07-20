@@ -1,12 +1,16 @@
 import { simulate } from './core/simulate.js';
+import { buildWorstWeekCallouts } from './core/fairness.js';
 import { DEMO_MEETING, DEMO_ROSTER } from './core/demo.js';
 import { parseMeetingInput } from './core/meeting.js';
 import { addTeammate, removeTeammate } from './core/roster.js';
 import { renderHeatmap } from './ui/heatmap.js';
+import { cellDetail } from './ui/heatmap.js';
+import { renderCallouts } from './ui/callouts.js';
 
 const state = {
   meeting: DEMO_MEETING,
   roster: DEMO_ROSTER,
+  selectedCell: null,
 };
 
 const heatmapEl = document.getElementById('heatmap');
@@ -20,11 +24,32 @@ const rosterAddForm = document.getElementById('roster-add-form');
 const rosterNameEl = document.getElementById('roster-name');
 const rosterTzEl = document.getElementById('roster-tz');
 const rosterErrorEl = document.getElementById('roster-error');
+const cellDetailEl = document.getElementById('cell-detail');
+const calloutsEl = document.getElementById('callouts');
 
 function render() {
   const result = simulate(state.meeting, state.roster);
-  renderHeatmap(heatmapEl, result);
+  renderHeatmap(heatmapEl, result, {
+    selectedCell: state.selectedCell,
+    onCellSelect: showCellDetail,
+  });
+  renderCallouts(calloutsEl, buildWorstWeekCallouts(result, state.meeting.timeZone), selectCallout);
   renderRosterList();
+}
+
+function showCellDetail({ person, week }) {
+  cellDetailEl.textContent = cellDetail(person, week);
+}
+
+function selectCallout(callout) {
+  state.selectedCell = { personIndex: callout.personIndex, weekIndex: callout.weekIndex };
+  showCellDetail(callout);
+  render();
+  const cell = heatmapEl.querySelector(
+    `[data-person-index="${callout.personIndex}"][data-week-index="${callout.weekIndex}"]`
+  );
+  cell?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  cell?.focus({ preventScroll: true });
 }
 
 function renderRosterList() {
@@ -54,6 +79,7 @@ function renderRosterList() {
     removeBtn.setAttribute('aria-label', `Remove ${person.name}`);
     removeBtn.addEventListener('click', () => {
       state.roster = removeTeammate(state.roster, index);
+      state.selectedCell = null;
       render();
     });
     item.appendChild(removeBtn);
@@ -78,6 +104,7 @@ function handleMeetingInputChange() {
 
   meetingTzErrorEl.textContent = '';
   state.meeting = result.meeting;
+  state.selectedCell = null;
   render();
 }
 
@@ -92,6 +119,7 @@ function handleRosterAddSubmit(event) {
 
   rosterErrorEl.textContent = '';
   state.roster = result.roster;
+  state.selectedCell = null;
   rosterNameEl.value = '';
   rosterTzEl.value = '';
   render();
