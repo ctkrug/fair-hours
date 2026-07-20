@@ -42,6 +42,12 @@ test('parseMeetingInput rejects non-numeric fields instead of throwing', () => {
   assert.ok(result.error);
 });
 
+test('parseMeetingInput rejects an absent object instead of throwing', () => {
+  const result = parseMeetingInput();
+  assert.equal(result.ok, false);
+  assert.match(result.error, /required/i);
+});
+
 test('parseMeetingInput accepts the boundary values 0 and 23/59', () => {
   assert.equal(parseMeetingInput({ ...VALID, dayOfWeek: '0', hour: '0', minute: '0' }).ok, true);
   assert.equal(parseMeetingInput({ ...VALID, dayOfWeek: '6', hour: '23', minute: '59' }).ok, true);
