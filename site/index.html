@@ -71,11 +71,16 @@
       <h2 id="heatmap-heading">Fairness heatmap</h2>
       <p class="heatmap-subhead">One row per teammate, one column per week for the next year.</p>
       <div id="heatmap" class="heatmap" aria-live="polite"></div>
+      <p id="cell-detail" class="cell-detail" aria-live="polite">Select a week to inspect its local time.</p>
       <ul class="heatmap-legend">
         <li><span class="legend-swatch cell-comfortable"></span> Comfortable</li>
         <li><span class="legend-swatch cell-early-or-late"></span> Early or late</li>
         <li><span class="legend-swatch cell-unreasonable"></span> Unreasonable</li>
       </ul>
+      <section class="callout-section" aria-labelledby="callouts-heading">
+        <h3 id="callouts-heading">Weeks that get worse</h3>
+        <ol id="callouts" class="callouts"></ol>
+      </section>
     </section>
   </main>
 
