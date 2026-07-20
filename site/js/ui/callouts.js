@@ -23,7 +23,11 @@ export function renderCallouts(container, callouts, onSelect) {
     button.className = 'callout';
     button.dataset.personIndex = String(callout.personIndex);
     button.dataset.weekIndex = String(callout.weekIndex);
-    button.innerHTML = `<strong>${callout.severity} min outside comfort</strong><span>${calloutSummary(callout)}</span>`;
+    const severity = document.createElement('strong');
+    severity.textContent = `${callout.severity} min outside comfort`;
+    const summary = document.createElement('span');
+    summary.textContent = calloutSummary(callout);
+    button.append(severity, summary);
     button.addEventListener('click', () => onSelect?.(callout));
     item.appendChild(button);
     container.appendChild(item);
