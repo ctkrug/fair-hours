@@ -6,6 +6,12 @@ import { validateTimeZoneInput } from './validation.js';
 
 export const WEEKDAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+function parseIntegerInput(value) {
+  if (typeof value === 'number') return Number.isInteger(value) ? value : Number.NaN;
+  if (typeof value !== 'string' || !/^\d+$/.test(value.trim())) return Number.NaN;
+  return Number(value);
+}
+
 /**
  * Parse raw meeting-form fields (strings, as they arrive from form inputs)
  * into a validated meeting object, or a designed error.
@@ -16,17 +22,17 @@ export function parseMeetingInput({ dayOfWeek, hour, minute, timeZone } = {}) {
     return { ok: false, error: timeZoneResult.error };
   }
 
-  const dow = Number(dayOfWeek);
+  const dow = parseIntegerInput(dayOfWeek);
   if (!Number.isInteger(dow) || dow < 0 || dow > 6) {
     return { ok: false, error: 'Day of week must be a value between Sunday and Saturday.' };
   }
 
-  const h = Number(hour);
+  const h = parseIntegerInput(hour);
   if (!Number.isInteger(h) || h < 0 || h > 23) {
     return { ok: false, error: 'Start hour must be between 0 and 23.' };
   }
 
-  const m = Number(minute);
+  const m = parseIntegerInput(minute);
   if (!Number.isInteger(m) || m < 0 || m > 59) {
     return { ok: false, error: 'Start minute must be between 0 and 59.' };
   }
