@@ -39,3 +39,12 @@ test('validateTeammateName rejects empty and whitespace-only names', () => {
   assert.equal(validateTeammateName('').ok, false);
   assert.equal(validateTeammateName('   ').ok, false);
 });
+
+test('validateTeammateName rejects non-string values without throwing', () => {
+  for (const value of [0, {}, [], Symbol('name')]) {
+    assert.deepEqual(validateTeammateName(value), {
+      ok: false,
+      error: 'Name is required.',
+    });
+  }
+});
