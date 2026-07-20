@@ -19,11 +19,13 @@ site/
       meeting.js           parses/validates raw meeting-form input
       roster.js            pure add/remove roster operations
       validation.js        shared name/time-zone field validation
+      fairness.js          severity metric and DST transition annotations
     ui/
-      heatmap.js           renders the fairness heatmap grid into the DOM
+      heatmap.js           renders keyboard-inspectable heatmap cells
+      callouts.js           renders ranked, linkable DST annotations
 test/
-  simulate.test.js, meeting.test.js, roster.test.js,
-  validation.test.js, heatmap.test.js
+  simulate.test.js, meeting.test.js, roster.test.js, validation.test.js,
+  fairness.test.js, heatmap.test.js, callouts.test.js
 ```
 
 ## Data flow
@@ -31,8 +33,8 @@ test/
 1. `main.js` seeds `state = { meeting, roster }` from `core/demo.js` so the
    heatmap renders immediately with no input (the wow moment).
 2. `render()` calls `simulate(state.meeting, state.roster)`
-   (`core/simulate.js`), then `renderHeatmap(container, result)`
-   (`ui/heatmap.js`).
+   (`core/simulate.js`), ranks DST-worsened weeks with
+   `buildWorstWeekCallouts`, then renders both the heatmap and annotations.
 3. Editing the meeting form or roster never mutates `state` directly: raw
    input goes through `parseMeetingInput` / `addTeammate`, which return
    `{ ok: true, ... }` or `{ ok: false, error }`. `main.js` only updates
@@ -87,7 +89,19 @@ to CSS class -- the only place color is decided, so a threshold change in
 `simulate.js` alone changes what's on screen. `renderHeatmap` is the only
 DOM-touching function; it rebuilds the grid from scratch on every call
 (no incremental diffing -- the data set is small enough that this is not a
-performance concern).
+performance concern). Cells are native buttons, labelled with their exact
+local date/time/classification; Tab and arrow keys reach them. `main.js`
+writes the same selected-cell detail into a live region.
+
+## Explainability (`core/fairness.js`, `ui/callouts.js`)
+
+`severityMinutes(local)` measures the minute distance outside 08:00–18:00.
+`buildWorstWeekCallouts` keeps only weeks where a nearby IANA offset change
+makes a person worse off, finds whether the organizer or teammate zone
+shifted, and sorts the records worst-first. `renderCallouts` creates native
+buttons for those records. Selecting one focuses and smoothly scrolls to its
+matching heatmap cell, rather than leaving the explanation disconnected from
+the year view.
 
 ## Running things
 
