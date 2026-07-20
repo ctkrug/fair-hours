@@ -26,7 +26,7 @@ site/
       callouts.js           renders ranked, linkable DST annotations
 test/
   simulate.test.js, meeting.test.js, roster.test.js, validation.test.js,
-  fairness.test.js, heatmap.test.js, callouts.test.js
+  fairness.test.js, heatmap.test.js, callouts.test.js, share.test.js
 ```
 
 ## Data flow
@@ -57,7 +57,8 @@ that zone's own DST changes -- Node/browser `Intl` only exposes the
 opposite direction (instant → local wall time), so:
 
 - `localTimeInZone(utcDate, timeZone)` -- instant → local wall-clock parts,
-  via `Intl.DateTimeFormat.formatToParts`.
+  via cached `Intl.DateTimeFormat.formatToParts` instances keyed by IANA zone,
+  keeping full-roster re-simulations responsive without reusing offsets.
 - `zonedTimeToUtc(year, month, day, hour, minute, timeZone)` -- inverts
   that: guesses the UTC instant assuming zero offset, reads back the
   offset `Intl` actually applies at that guess, and corrects for it (twice,
