@@ -17,25 +17,34 @@ export function isValidTimeZone(tz) {
   }
 }
 
+const localTimeFormatters = new Map();
+
+function localTimeFormatter(timeZone) {
+  let formatter = localTimeFormatters.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: false,
+      weekday: 'short',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    localTimeFormatters.set(timeZone, formatter);
+  }
+  return formatter;
+}
+
 /**
  * Resolve the local wall-clock time for a UTC instant in a given IANA time
  * zone, using the formatter's own DST rules for that specific date rather
  * than a fixed offset.
  */
 export function localTimeInZone(utcDate, timeZone) {
-  const fmt = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: false,
-    weekday: 'short',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
   const parts = Object.fromEntries(
-    fmt.formatToParts(utcDate).map((p) => [p.type, p.value])
+    localTimeFormatter(timeZone).formatToParts(utcDate).map((p) => [p.type, p.value])
   );
 
   return {
