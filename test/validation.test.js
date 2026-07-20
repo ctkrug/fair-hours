@@ -20,6 +20,15 @@ test('validateTimeZoneInput rejects an unrecognized zone with a specific message
   assert.match(result.error, /Mars\/Olympus_Mons/);
 });
 
+test('validateTimeZoneInput rejects non-string values without throwing', () => {
+  for (const value of [42, {}, [], Symbol('zone')]) {
+    assert.deepEqual(validateTimeZoneInput(value), {
+      ok: false,
+      error: 'Time zone is required.',
+    });
+  }
+});
+
 test('validateTeammateName accepts a name, trimmed', () => {
   const result = validateTeammateName('  Priya  ');
   assert.equal(result.ok, true);
