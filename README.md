@@ -69,9 +69,10 @@ in CI.
 ## Status
 
 Core simulation, editable meeting/roster, full-year heatmap, DST explainability, and
-shareable validated plans are built and working end to end (Epics 1–3) — see
-[`docs/VISION.md`](docs/VISION.md) for the full design and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for what's next (shareable URLs and hardening).
+shareable validated plans are built and working end to end. The QA suite covers
+time-zone math, validation, sharing, fairness ranking, and keyboard-grid helpers —
+see [`docs/VISION.md`](docs/VISION.md) for the product direction and
+[`docs/BACKLOG.md`](docs/BACKLOG.md) for completed scope.
 
 ## License
 
