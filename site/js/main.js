@@ -42,6 +42,9 @@ const rosterErrorEl = document.getElementById('roster-error');
 const cellDetailEl = document.getElementById('cell-detail');
 const calloutsEl = document.getElementById('callouts');
 const planNoticeEl = document.getElementById('plan-notice');
+const copyLinkEl = document.getElementById('copy-link');
+const copyStatusEl = document.getElementById('copy-status');
+let copyStatusTimer;
 
 function populateMeetingForm() {
   meetingDayEl.value = String(state.meeting.dayOfWeek);
@@ -51,6 +54,34 @@ function populateMeetingForm() {
 
 function updateShareUrl() {
   window.history.replaceState({}, '', buildShareUrl(window.location.href, state.meeting, state.roster));
+}
+
+function showCopyStatus(message, isError = false) {
+  window.clearTimeout(copyStatusTimer);
+  copyStatusEl.textContent = message;
+  copyStatusEl.classList.toggle('is-error', isError);
+  copyLinkEl.classList.toggle('is-confirmed', !isError);
+  copyLinkEl.textContent = isError ? 'Copy share link' : 'Copied link';
+  copyStatusTimer = window.setTimeout(() => {
+    copyStatusEl.textContent = '';
+    copyStatusEl.classList.remove('is-error');
+    copyLinkEl.classList.remove('is-confirmed');
+    copyLinkEl.textContent = 'Copy share link';
+  }, 3000);
+}
+
+async function copyShareLink() {
+  if (!navigator.clipboard?.writeText) {
+    showCopyStatus('Copying is unavailable in this browser. Copy the address bar URL instead.', true);
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    showCopyStatus('Share link copied.');
+  } catch (error) {
+    showCopyStatus('Could not copy the link. Copy the address bar URL instead.', true);
+  }
 }
 
 function render() {
@@ -156,6 +187,7 @@ function handleRosterAddSubmit(event) {
 
 meetingForm.addEventListener('input', handleMeetingInputChange);
 rosterAddForm.addEventListener('submit', handleRosterAddSubmit);
+copyLinkEl.addEventListener('click', copyShareLink);
 
 populateMeetingForm();
 planNoticeEl.textContent = plan.notice;
