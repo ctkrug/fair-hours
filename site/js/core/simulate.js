@@ -77,6 +77,17 @@ export function zonedTimeToUtc(year, month, day, hour, minute, timeZone) {
     instantMs = naiveUtcMs - refinedOffset * 60000;
   }
 
+  // A spring-forward gap has no exact wall-clock match. The offset refinement
+  // above lands on the preceding clock time; shift forward by the skipped
+  // interval so a recurring meeting follows calendar-event convention.
+  const resolved = localTimeInZone(new Date(instantMs), timeZone);
+  const resolvedWallMs = Date.UTC(
+    resolved.year, resolved.month - 1, resolved.day, resolved.hour, resolved.minute
+  );
+  if (resolvedWallMs < naiveUtcMs) {
+    instantMs += naiveUtcMs - resolvedWallMs;
+  }
+
   return new Date(instantMs);
 }
 
