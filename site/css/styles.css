@@ -238,6 +238,35 @@ body {
   background: #6ee0ef;
 }
 
+.btn-share {
+  width: 100%;
+  margin-top: var(--space-2);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-family: var(--font-display);
+}
+
+.btn-share:hover {
+  background: rgba(79, 214, 232, 0.12);
+  box-shadow: 2px 2px 0 var(--grid-line);
+}
+
+.btn-share.is-confirmed {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.copy-status {
+  min-height: 1.25em;
+  margin: var(--space-2) 0 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.copy-status.is-error {
+  color: var(--danger);
+}
+
 .btn-remove {
   background: transparent;
   color: var(--text-muted);
