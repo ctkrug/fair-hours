@@ -77,7 +77,8 @@ async function copyShareLink() {
   }
 
   try {
-    await navigator.clipboard.writeText(window.location.href);
+    const shareUrl = buildShareUrl(window.location.href, state.meeting, state.roster);
+    await navigator.clipboard.writeText(shareUrl);
     showCopyStatus('Share link copied.');
   } catch (error) {
     showCopyStatus('Could not copy the link. Copy the address bar URL instead.', true);
