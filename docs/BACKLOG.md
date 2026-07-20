@@ -93,7 +93,7 @@ concrete, checkable acceptance criteria — no "works well" vibes checks.
 
 ## Epic 3 — Sharing, validation & ship polish
 
-- [ ] **3.1 — Shareable URL state.**
+- [x] **3.1 — Shareable URL state.**
   Encode the full meeting + roster into the URL (e.g. query string or hash)
   so a link fully reproduces a plan.
   - Loading a URL with valid encoded state renders that exact meeting/roster
@@ -101,14 +101,14 @@ concrete, checkable acceptance criteria — no "works well" vibes checks.
   - Round-trip test: encode a plan, decode it, and confirm the decoded plan
     equals the original (day, time, organizer zone, every teammate).
 
-- [ ] **3.2 — Copy-link control.**
+- [x] **3.2 — Copy-link control.**
   A themed "copy link" action that copies the current shareable URL.
   - Button shows a themed hover/focus/active state and a confirmation
     (e.g. "Copied") that clears after a few seconds.
   - Falls back gracefully (visible error state) if the Clipboard API is
     unavailable, rather than failing silently.
 
-- [ ] **3.3 — Input validation & graceful failure.**
+- [x] **3.3 — Input validation & graceful failure.**
   Harden against malformed input: bad URL state, invalid time zone strings,
   empty/whitespace teammate names, duplicate zones.
   - A malformed URL state (truncated, garbage, or an unknown tz inside it)
@@ -117,7 +117,7 @@ concrete, checkable acceptance criteria — no "works well" vibes checks.
   - All validation is covered by unit tests with at least one deliberately
     malformed input per validated field.
 
-- [ ] **3.4 — Final responsive, accessibility, and design self-review.**
+- [x] **3.4 — Final responsive, accessibility, and design self-review.**
   Full pass against the design standard's D3 checklist before this project
   can close out.
   - Verified at 390×844, 768×1024, and 1440×900: composed, no dead space,
