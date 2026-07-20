@@ -10,7 +10,7 @@ export const WEEKDAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thur
  * Parse raw meeting-form fields (strings, as they arrive from form inputs)
  * into a validated meeting object, or a designed error.
  */
-export function parseMeetingInput({ dayOfWeek, hour, minute, timeZone }) {
+export function parseMeetingInput({ dayOfWeek, hour, minute, timeZone } = {}) {
   const timeZoneResult = validateTimeZoneInput(timeZone);
   if (!timeZoneResult.ok) {
     return { ok: false, error: timeZoneResult.error };
