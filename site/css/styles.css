@@ -9,6 +9,7 @@
   --accent-support: #f2a65a;
   --success: #63d69a;
   --danger: #ef5b6f;
+  --shadow: 0 0 0 1px var(--grid-line), 0 8px 24px rgba(0, 0, 0, 0.35);
 
   --font-display: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
   --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
