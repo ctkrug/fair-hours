@@ -2,6 +2,8 @@ import {
   COMFORT,
   COMFORTABLE_END_HOUR,
   COMFORTABLE_START_HOUR,
+  localTimeInZone,
+  timeZoneOffsetMinutesAt,
 } from './simulate.js';
 
 const MINUTES_PER_HOUR = 60;
@@ -32,4 +34,41 @@ export function comfortLabel(classification) {
   return classification === COMFORT.EARLY_OR_LATE
     ? 'early or late'
     : classification;
+}
+
+const DAY_MS = 86400000;
+const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+/**
+ * Find the latest offset change in the week ending at an occurrence. The
+ * sampled midday instants avoid ambiguous local clock hours while preserving
+ * the local calendar day needed for an understandable DST annotation.
+ */
+export function findRecentTransition(utc, timeZone) {
+  const endDay = Date.UTC(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate(), 12);
+  let previousOffset = timeZoneOffsetMinutesAt(endDay - 8 * DAY_MS, timeZone);
+
+  for (let day = 7; day >= 0; day -= 1) {
+    const instant = endDay - day * DAY_MS;
+    const offset = timeZoneOffsetMinutesAt(instant, timeZone);
+    if (offset !== previousOffset) {
+      const local = localTimeInZone(new Date(instant), timeZone);
+      return {
+        timeZone,
+        local,
+        direction: offset > previousOffset ? 'starts' : 'ends',
+      };
+    }
+    previousOffset = offset;
+  }
+  return null;
+}
+
+/** Format a detected time-zone offset change as a concise DST explanation. */
+export function transitionLabel(transition) {
+  if (!transition) return 'No nearby DST transition';
+  return `${transition.timeZone} DST ${transition.direction} ${MONTH_NAMES[transition.local.month - 1]} ${transition.local.day}`;
 }
