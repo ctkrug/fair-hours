@@ -6,10 +6,25 @@ import { addTeammate, removeTeammate } from './core/roster.js';
 import { renderHeatmap } from './ui/heatmap.js';
 import { cellDetail } from './ui/heatmap.js';
 import { renderCallouts } from './ui/callouts.js';
+import { decodePlanState } from './core/share.js';
+
+function initialPlan() {
+  const rawPlan = new URL(window.location.href).searchParams.get('plan');
+  if (!rawPlan) {
+    return { meeting: DEMO_MEETING, roster: DEMO_ROSTER, notice: '' };
+  }
+
+  const decoded = decodePlanState(rawPlan);
+  return decoded.ok
+    ? { meeting: decoded.meeting, roster: decoded.roster, notice: '' }
+    : { meeting: DEMO_MEETING, roster: DEMO_ROSTER, notice: decoded.error };
+}
+
+const plan = initialPlan();
 
 const state = {
-  meeting: DEMO_MEETING,
-  roster: DEMO_ROSTER,
+  meeting: plan.meeting,
+  roster: plan.roster,
   selectedCell: null,
 };
 
@@ -26,6 +41,13 @@ const rosterTzEl = document.getElementById('roster-tz');
 const rosterErrorEl = document.getElementById('roster-error');
 const cellDetailEl = document.getElementById('cell-detail');
 const calloutsEl = document.getElementById('callouts');
+const planNoticeEl = document.getElementById('plan-notice');
+
+function populateMeetingForm() {
+  meetingDayEl.value = String(state.meeting.dayOfWeek);
+  meetingTimeEl.value = `${String(state.meeting.hour).padStart(2, '0')}:${String(state.meeting.minute).padStart(2, '0')}`;
+  meetingTzEl.value = state.meeting.timeZone;
+}
 
 function render() {
   const result = simulate(state.meeting, state.roster);
@@ -128,4 +150,6 @@ function handleRosterAddSubmit(event) {
 meetingForm.addEventListener('input', handleMeetingInputChange);
 rosterAddForm.addEventListener('submit', handleRosterAddSubmit);
 
+populateMeetingForm();
+planNoticeEl.textContent = plan.notice;
 render();
