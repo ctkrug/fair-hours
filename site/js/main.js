@@ -6,7 +6,7 @@ import { addTeammate, removeTeammate } from './core/roster.js';
 import { renderHeatmap } from './ui/heatmap.js';
 import { cellDetail } from './ui/heatmap.js';
 import { renderCallouts } from './ui/callouts.js';
-import { decodePlanState } from './core/share.js';
+import { buildShareUrl, decodePlanState } from './core/share.js';
 
 function initialPlan() {
   const rawPlan = new URL(window.location.href).searchParams.get('plan');
@@ -47,6 +47,10 @@ function populateMeetingForm() {
   meetingDayEl.value = String(state.meeting.dayOfWeek);
   meetingTimeEl.value = `${String(state.meeting.hour).padStart(2, '0')}:${String(state.meeting.minute).padStart(2, '0')}`;
   meetingTzEl.value = state.meeting.timeZone;
+}
+
+function updateShareUrl() {
+  window.history.replaceState({}, '', buildShareUrl(window.location.href, state.meeting, state.roster));
 }
 
 function render() {
@@ -102,6 +106,7 @@ function renderRosterList() {
     removeBtn.addEventListener('click', () => {
       state.roster = removeTeammate(state.roster, index);
       state.selectedCell = null;
+      updateShareUrl();
       render();
     });
     item.appendChild(removeBtn);
@@ -127,6 +132,7 @@ function handleMeetingInputChange() {
   meetingTzErrorEl.textContent = '';
   state.meeting = result.meeting;
   state.selectedCell = null;
+  updateShareUrl();
   render();
 }
 
@@ -144,6 +150,7 @@ function handleRosterAddSubmit(event) {
   state.selectedCell = null;
   rosterNameEl.value = '';
   rosterTzEl.value = '';
+  updateShareUrl();
   render();
 }
 
